@@ -1,0 +1,1 @@
+from picographics import PicoGraphics, DISPLAY_INKY_FRAME_7 as DISPLAY 
