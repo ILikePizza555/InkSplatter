@@ -14,7 +14,7 @@ def boot():
     # A short delay to give USB chance to initialise
     time.sleep(0.5)
 
-    logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+    logging.basicConfig(level=logging.DEBUG, stream=sys.stdout, format="%(asctime)s:%(levelname)s - %(message)s")
 
     # Setup for the display.
     graphics = PicoGraphics(DISPLAY)
