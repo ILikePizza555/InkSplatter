@@ -12,16 +12,16 @@ class BaseLED:
         self.pulse_speed_hz = pulse_speed_hz
         self.pulse_timer = Timer(-1)
 
-    @property
-    def brightness(self):
+    def get_brightness(self):
         return self.pwm.duty_u16()
     
-    @brightness.setter
     def set_brightness(self, brightness: int):
         brightness = max(0, min(100, brightness))
         # gamma correct the brightness (gamma 2.8)
         value = int(pow(brightness / 100.0, 2.8) * 65535.0 + 0.5)
         self.pwm.duty_u16(value)
+
+    brightness = property(get_brightness, set_brightness)
 
     def _timer_callback(self, t):
         # updates the network led brightness based on a sinusoid seeded by the current time
