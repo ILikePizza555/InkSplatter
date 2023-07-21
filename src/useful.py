@@ -10,7 +10,6 @@ import logging
 import network
 import time
 
-
 HOLD_VSYS_EN_PIN = 2
 
 I2C_SDA_PIN = 4
@@ -25,6 +24,7 @@ if hold_vsys_en_pin is None:
 real_time_chip = None
 
 def setup_real_time_chip():
+    global real_time_chip
     if real_time_chip is None:
         i2c = PimoroniI2C(I2C_SDA_PIN, I2C_SCL_PIN, 100000)
         real_time_chip = PCF85063A(i2c)
@@ -72,10 +72,16 @@ def network_connect(ssid, psk):
         WARN_LED.on()
 
 def load_data(file = "/data.json"):
-    logging.debug("Loading data from %s. Mem alloc: %d. Mem free: %d", file, gc.mem_alloc(), gc.mem_free())
-    data = json.loads(open(file).read())
-    if type(data) is dict:
-        logging.debug("Successfully loaded data. Mem alloc: %d. Mem free: %d", gc.mem_alloc(), gc.mem_free())
-        return data
-    else:
-        logging.error("Couldn't load data.json.")
+    try:
+        logging.debug("Loading data from %s. Mem alloc: %d. Mem free: %d", file, gc.mem_alloc(), gc.mem_free())
+        with open(file) as f:
+            data = json.loads(f.read())
+    
+        if type(data) is dict:
+            logging.debug("Successfully loaded data. Mem alloc: %d. Mem free: %d", gc.mem_alloc(), gc.mem_free())
+            return data
+        else:
+            logging.error("Couldn't load data.json due to invalid type.")
+    except OSError as e:
+        logging.error("Couldn't load data.json: %s", e)
+        return
