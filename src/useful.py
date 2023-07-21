@@ -3,10 +3,13 @@ from machine import Pin, PWM
 from pimoroni_i2c import PimoroniI2C
 from pcf85063a import PCF85063A
 
+import gc
+import inky_frame
+import json
 import logging
 import network
 import time
-import inky_frame
+
 
 HOLD_VSYS_EN_PIN = 2
 
@@ -67,3 +70,12 @@ def network_connect(ssid, psk):
     else:
         logging.warning("Connection failed. Status: %d", status)
         WARN_LED.on()
+
+def load_data(file = "/data.json"):
+    logging.debug("Loading data from %s. Mem alloc: %d. Mem free: %d", file, gc.mem_alloc(), gc.mem_free())
+    data = json.loads(open(file).read())
+    if type(data) is dict:
+        logging.debug("Successfully loaded data. Mem alloc: %d. Mem free: %d", gc.mem_alloc(), gc.mem_free())
+        return data
+    else:
+        logging.error("Couldn't load data.json.")

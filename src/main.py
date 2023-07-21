@@ -7,14 +7,13 @@ import time
 import sys
 import useful
 
+data = None
+
 def boot():
     # A short delay to give USB chance to initialise
     time.sleep(0.5)
 
-    logging.basicConfig(level=logging.DEBUG, handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler("1.log")
-    ])
+    logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
     # Setup for the display.
     graphics = PicoGraphics(DISPLAY)
@@ -25,5 +24,10 @@ def boot():
     NETWORK_LED.stop()
     WARN_LED.stop()
     useful.clear_button_leds()
+
+    global data
+    data = useful.load_data()
+
+    logging.info("Initialized")
 
 boot()
