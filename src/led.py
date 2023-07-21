@@ -27,8 +27,10 @@ class BaseLED:
         # updates the network led brightness based on a sinusoid seeded by the current time
         self.brightness = (math.sin(time.ticks_ms() * math.pi * 2 / (1000 / self.pulse_speed_hz)) * 40) + 60
     
-    def pulse(self, pulse_speed):
-        self.pulse_speed_hz = pulse_speed
+    def pulse(self, pulse_speed = None):
+        if pulse_speed is not None:
+            self.pulse_speed_hz = pulse_speed
+
         self.pulse_timer.deinit()
         self.pulse_timer.init(period=50, mode=Timer.PERIODIC, callback=self._timer_callback)
 
