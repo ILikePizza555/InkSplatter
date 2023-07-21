@@ -6,6 +6,7 @@ import logging
 import time
 import sys
 import useful
+import wlan
 
 data = None
 
@@ -29,7 +30,7 @@ def boot():
     data = useful.load_json()
 
     if "wlan" in data:
-        useful.select_network(data["wlan"])
+        wlan.find_and_connect_network(data["wlan"])
 
     logging.info("Initialized")
 

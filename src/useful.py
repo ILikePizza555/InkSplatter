@@ -1,5 +1,4 @@
 from binascii import hexlify
-from led import NETWORK_LED, WARN_LED
 from machine import Pin, PWM
 from pimoroni_i2c import PimoroniI2C
 from pcf85063a import PCF85063A
@@ -40,52 +39,6 @@ def clear_button_leds():
     inky_frame.button_d.led_off()
     inky_frame.button_e.led_off()
 
-def connect_network(wlan: network.WLAN, ssid, psk):
-    # Number of attempts before timeout
-    max_wait = 10
-
-    logging.info("Connecting to %s", ssid)
-    NETWORK_LED.pulse()
-    wlan.connect(ssid, psk)
-
-    while max_wait > 10:
-        status = wlan.status()
-        logging.debug("Connection attempt %d, status: %d", max_wait, status)
-
-        if status < 0 or status >= 3:
-            break
-
-        max_wait -= 1
-        time.sleep(1)
-    
-    NETWORK_LED.stop()
-    NETWORK_LED.pwm.duty_u16(30000)
-    status = wlan.status()
-
-    if status == 3:
-        logging.info("Connection successful.")
-        return True
-    else:
-        logging.warning("Connection failed. Status: %d", status)
-        WARN_LED.on()
-        return False
-
-def select_network(wifi_data: dict):
-    logging.debug("Enabling Wifi")
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active = True
-
-    network_list = wlan.scan()
-    logging.info("Found networks: %s", network_list)
-    for network in network_list:
-        ssid = network[0]
-        if ssid in wifi_data:
-            logging.info("Located known network %s.", ssid)
-            success = connect_network(wlan, ssid, wifi_data[ssid])
-            if success:
-                return success
-    
-    return False
 
 def load_json(file = "/data.json"):
     try:
