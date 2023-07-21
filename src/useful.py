@@ -1,3 +1,4 @@
+from binascii import hexlify
 from led import NETWORK_LED, WARN_LED
 from machine import Pin, PWM
 from pimoroni_i2c import PimoroniI2C
@@ -39,11 +40,7 @@ def clear_button_leds():
     inky_frame.button_d.led_off()
     inky_frame.button_e.led_off()
 
-def network_connect(ssid, psk):
-    logging.debug("Enabling Wifi")
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active = True
-
+def connect_network(wlan: network.WLAN, ssid, psk):
     # Number of attempts before timeout
     max_wait = 10
 
@@ -67,11 +64,30 @@ def network_connect(ssid, psk):
 
     if status == 3:
         logging.info("Connection successful.")
+        return True
     else:
         logging.warning("Connection failed. Status: %d", status)
         WARN_LED.on()
+        return False
 
-def load_data(file = "/data.json"):
+def select_network(wifi_data: dict):
+    logging.debug("Enabling Wifi")
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active = True
+
+    network_list = wlan.scan()
+    logging.info("Found networks: %s", network_list)
+    for network in network_list:
+        ssid = network[0]
+        if ssid in wifi_data:
+            logging.info("Located known network %s.", ssid)
+            success = connect_network(wlan, ssid, wifi_data[ssid])
+            if success:
+                return success
+    
+    return False
+
+def load_json(file = "/data.json"):
     try:
         logging.debug("Loading data from %s. Mem alloc: %d. Mem free: %d", file, gc.mem_alloc(), gc.mem_free())
         with open(file) as f:

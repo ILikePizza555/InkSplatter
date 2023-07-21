@@ -26,7 +26,10 @@ def boot():
     useful.clear_button_leds()
 
     global data
-    data = useful.load_data()
+    data = useful.load_json()
+
+    if "wlan" in data:
+        useful.select_network(data["wlan"])
 
     logging.info("Initialized")
 
