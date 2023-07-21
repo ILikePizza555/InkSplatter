@@ -1,18 +1,17 @@
+from led import NETWORK_LED, WARN_LED
+from machine import Pin, PWM
 from pimoroni_i2c import PimoroniI2C
 from pcf85063a import PCF85063A
-from machine import Pin, PWM
 
 import logging
 import network
-import network_led
 import time
+import inky_frame
 
 HOLD_VSYS_EN_PIN = 2
 
 I2C_SDA_PIN = 4
 I2C_SCL_PIN = 5
-
-led_warn = Pin(6, Pin.OUT)
 
 # Pin setup for VSYS_HOLD needed to sleep and wake.
 hold_vsys_en_pin = None
@@ -29,6 +28,14 @@ def setup_real_time_chip():
 
 setup_real_time_chip()
 
+# Turns off the button LEDs
+def clear_button_leds():
+    inky_frame.button_a.led_off()
+    inky_frame.button_b.led_off()
+    inky_frame.button_c.led_off()
+    inky_frame.button_d.led_off()
+    inky_frame.button_e.led_off()
+
 def network_connect(ssid, psk):
     logging.debug("Enabling Wifi")
     wlan = network.WLAN(network.STA_IF)
@@ -38,7 +45,7 @@ def network_connect(ssid, psk):
     max_wait = 10
 
     logging.info("Connecting to %s", ssid)
-    network_led.pulse()
+    NETWORK_LED.pulse()
     wlan.connect(ssid, psk)
 
     while max_wait > 10:
@@ -51,12 +58,12 @@ def network_connect(ssid, psk):
         max_wait -= 1
         time.sleep(1)
     
-    network_led.stop()
-    network_led.pwm.duty_u16(30000)
+    NETWORK_LED.stop()
+    NETWORK_LED.pwm.duty_u16(30000)
     status = wlan.status()
 
     if status == 3:
         logging.info("Connection successful.")
     else:
         logging.warning("Connection failed. Status: %d", status)
-        led_warn.on()
+        WARN_LED.on()
