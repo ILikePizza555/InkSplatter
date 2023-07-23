@@ -7,6 +7,7 @@ import time
 import sys
 import useful
 import wlan
+import jpegdec
 
 # Length of time between updates in minutes.
 # Frequent updates will reduce battery life!
@@ -26,7 +27,7 @@ def boot():
     time.sleep(0.5)
 
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout, format="%(msecs)d:%(levelname)s - %(message)s")
-    logging.debug("Mem alloc: %d. Mem free: %d", gc.mem_alloc(), gc.mem_free())
+    useful.log_mem_stats()
 
     # Reset LEDs
     NETWORK_LED.stop()
@@ -39,18 +40,40 @@ def boot():
     if "wlan" in data:
         wlan.find_and_connect_network(data["wlan"])
 
-    logging.debug("Mem alloc: %d. Mem free: %d", gc.mem_alloc(), gc.mem_free())
-    gc.collect()
-    logging.debug("Mem alloc: %d. Mem free: %d", gc.mem_alloc(), gc.mem_free())
+    useful.collect_and_log_mem_stats()
 
 def app(api_url: str):
     global UPDATE_INTERVAL
     logging.info("Starting app")
     api_response = useful.load_json_from_url(api_url)
-    logging.debug("Mem alloc: %d. Mem free: %d", gc.mem_alloc(), gc.mem_free())
+    useful.log_mem_stats()
+
     img_url = api_response["url"]
     title = api_response["title"]
-    logging.info("Downloading image titled \"%s\" from %s", title, img_url)
+
+    useful.save_image_from_url(img_url, "images/image.jpg")
+    useful.collect_and_log_mem_stats()
+
+    logging.debug("Beginning draw")
+    graphics, WIDTH, HEIGHT = setup_display()
+    jpeg = jpegdec.JPEG(graphics)
+    useful.collect_and_log_mem_stats()
+
+    graphics.set_pen(1)
+    graphics.clear()
+
+    jpeg.open_file("images/image.jpg")
+    jpeg.decode()
+
+    graphics.set_pen(0)
+    graphics.rectangle(0, HEIGHT - 25, WIDTH, 25)
+    graphics.set_pen(1)
+    graphics.text(title, 5, HEIGHT - 20, WIDTH, 2)
+
+    useful.collect_and_log_mem_stats()
+
+    graphics.update()
+    graphics.info("Done")
     
 
 boot()

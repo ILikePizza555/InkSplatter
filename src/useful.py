@@ -24,6 +24,14 @@ if hold_vsys_en_pin is None:
 # intialise the pcf85063a real time clock chip
 real_time_chip = None
 
+def log_mem_stats():
+    logging.debug("Mem alloc: %d. Mem free: %d", gc.mem_alloc(), gc.mem_free())
+
+def collect_and_log_mem_stats():
+    log_mem_stats()
+    gc.collect()
+    log_mem_stats()
+
 def setup_real_time_chip():
     global real_time_chip
     if real_time_chip is None:
@@ -67,3 +75,10 @@ def load_json_from_url(url):
     finally:
         if response is not None:
             response.close()
+
+def save_image_from_url(url, filename):
+    logging.info("Downloading %s to %s", url, filename)
+    response = requests.get(url, headers = {"Accept": "image/jpeg"})
+    response.save(filename)
+    response.close()
+    logging.info("Image saved successfully.")
