@@ -43,14 +43,15 @@ def boot():
     gc.collect()
     logging.debug("Mem alloc: %d. Mem free: %d", gc.mem_alloc(), gc.mem_free())
 
-def app(api_info: dict):
+def app(api_url: str):
     global UPDATE_INTERVAL
     logging.info("Starting app")
-    api_response = useful.load_json_from_url(api_info["api_url"])
-    img_url = api_response["image_url"]
+    api_response = useful.load_json_from_url(api_url)
+    logging.debug("Mem alloc: %d. Mem free: %d", gc.mem_alloc(), gc.mem_free())
+    img_url = api_response["url"]
     title = api_response["title"]
     logging.info("Downloading image titled \"%s\" from %s", title, img_url)
     
 
 boot()
-app(data["api_info"])
+app(data["api_url"])
