@@ -2,6 +2,7 @@ from binascii import hexlify
 from machine import Pin, PWM
 from pimoroni_i2c import PimoroniI2C
 from pcf85063a import PCF85063A
+import mrequests as requests
 
 import gc
 import inky_frame
@@ -54,3 +55,15 @@ def load_json(file = "/data.json"):
     except OSError as e:
         logging.error("Couldn't load data.json: %s", e)
         return
+
+
+def load_json_from_url(url):
+    try:
+        logging.debug("Loading url %s", url)
+        response = requests.get(url, headers = {"Accept": "application/json"})
+        return response.json()
+    except Exception as e:
+        logging.error("Error getting url: %s", e)
+    finally:
+        if response is not None:
+            response.close()
