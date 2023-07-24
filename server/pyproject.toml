@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "inksplatter-server"
+version = "0.1.0"
+description = ""
+authors = ["Izzy Lancaster <avrisaac555@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "inksplatter_server"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.100.0"
+google-cloud-vision = "^3.4.4"
+google-cloud-firestore = "^2.11.1"
+Pillow = "^10.0.0"
+uvicorn = "^0.23.1"
+httpx = "^0.24.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
