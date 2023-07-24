@@ -7,7 +7,10 @@ from io import BytesIO
 from PIL import Image
 from urllib.parse import unquote
 
-app = FastAPI()
+app = FastAPI(
+    title="InkSplatter Service",
+    summary="Image fetching and processing service for InkSplatter project"
+)
 
 def get_crop_hints(image_bytes: bytes, aspect_ratios: list[float] = [1.66]):
     vision_client = vision.ImageAnnotatorClient()
@@ -26,8 +29,8 @@ def get_crop_hints(image_bytes: bytes, aspect_ratios: list[float] = [1.66]):
         "importanceFraction": hint.importanceFraction
     }
 
-app.get("/")
-async def get_image(image_url: str):
+@app.get("/")
+async def root(image_url: str):
     async with httpx.AsyncClient() as client:
         img_url_response = await client.get(unquote(image_url))
         img_url_response.raise_for_status()
