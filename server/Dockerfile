@@ -12,4 +12,4 @@ COPY . ./
 
 RUN poetry config virtualenvs.create false && \
     poetry install --no-root --no-interaction --no-ansi
-CMD python -m uvicorn main:app --port $PORT
+CMD python -m uvicorn main:app --host 0.0.0.0 --port $PORT
