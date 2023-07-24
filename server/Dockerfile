@@ -11,4 +11,4 @@ WORKDIR /usr/src/app
 COPY . ./
 
 RUN poetry install --no-root
-CMD poetry run python -m uvicorn main:app
+CMD poetry run python -m uvicorn main:app --port $PORT
