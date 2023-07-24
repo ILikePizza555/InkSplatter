@@ -1,9 +1,12 @@
 """Server component for image API."""
+from dotenv import load_dotenv
 from fastapi import FastAPI, Response
 from PIL import Image
 from io import BytesIO
 
-app = FastAPI()
+load_dotenv()
+
+app = FastAPI(title="Inksplatter API")
 
 @app.get("/image")
 async def image():
