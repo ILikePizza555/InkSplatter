@@ -10,5 +10,6 @@ WORKDIR /usr/src/app
 
 COPY . ./
 
-RUN poetry install --no-root
+RUN poetry config virtualenvs.create false \
+    poetry install --no-dev --no-interaction --no-ansi
 CMD poetry run python -m uvicorn main:app --port $PORT
